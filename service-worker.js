@@ -1,4 +1,4 @@
-const CACHE_NAME = 'car-radio-v5.0'; // map rotating marker correct.
+const CACHE_NAME = 'car-radio-v5.1'; // map rotating marker correct.
 
 const FILES_TO_CACHE = [
   './',
