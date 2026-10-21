@@ -1,0 +1,17 @@
+# Deployment-specific browser settings and local archives
+config.local.js
+.local-archive/
+
+# Private credentials and local tooling
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+node_modules/
+coverage/
+*.log
+Thumbs.db
+.DS_Store

@@ -1,176 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Dashboard</title>
-    <link rel="icon" type="image/png" href="radio-icon-192.png" />
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="car-style.css">
-    <link rel="stylesheet" href="map-style.css">
-    <link rel="manifest" href="manifest.json" />
-</head>
-<body class="day-mode"> 
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <title>Car Dashboard</title>
+        <link rel="icon" type="image/png" href="radio-icon-192.png" />
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <!-- Main CSS -->
+        <link rel="stylesheet" href="car-style.css" />
+        <link rel="stylesheet" href="map-style.css" />
+        <link rel="manifest" href="manifest.json" />
+    </head>
+    <body class="day-mode">
+        <!-- BACKGROUND MAP -->
+        <div id="map-mask">
+            <!-- The Map is huge and spins inside the mask -->
+            <div id="map-container"></div>
+        </div>
+        <div class="map-attribution">
+            &copy;
+            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer"
+                >OpenStreetMap</a
+            >
+            contributors<span class="carto-credit"
+                >, &copy;
+                <a href="https://carto.com/attribution/" target="_blank" rel="noopener noreferrer"
+                    >CARTO</a
+                ></span
+            >
+        </div>
 
-    <!-- BACKGROUND MAP -->
-     <div id="map-mask">
-        <!-- The Map is huge and spins inside the mask -->
-        <div id="map-container"></div>
-    </div>
-     <!-- <div id="car-marker-overlay">
-        <div class="car-icon">🚗</div>
-    </div>  -->
-
-    <!-- HUD INTERFACE -->
-    <div class="dashboard-wrapper">
-        
-        <!-- MAIN AREA (Top ~70%) -->
-        <div class="main-area">
-            
-            <!-- LEFT COLUMN (Info) -->
-            <div class="left-column">
-                
-                <!-- 1. GPS Bar -->
-                <div class="top-bar glass-panel">
-                    <div class="address-box">
-                        <span class="icon">📍</span>
-                        <span id="current-address">Acquiring GPS...</span>
-                    </div>
-                    <div class="system-box">
-                        <span id="digital-clock">00:00</span>
-                        <button id="menu-btn">☰</button>
-                    </div>
-                </div>
-
-                <!-- 2. Telemetry Stack -->
-                <div id="telemetry-widget" class="glass-panel vertical-stack">
-<!-- Speed (With Ring) -->
-                    <div class="tele-item">
-                        <div class="speed-gauge-container">
-                            <!-- The Ring (Background + Active) -->
-                            <div class="speed-ring-bg"></div>
-                            <div class="speed-ring-active" id="speed-ring"></div>
-                            
-                            <!-- The Number -->
-                            <div class="speed-content">
-                                <span id="speed-val">0</span>
-                                <span class="unit">km/h</span>
-                            </div>
+        <!-- HUD INTERFACE -->
+        <div class="dashboard-wrapper">
+            <!-- MAIN AREA (Top ~70%) -->
+            <div class="main-area">
+                <!-- LEFT COLUMN (Info) -->
+                <div class="left-column">
+                    <!-- 1. GPS Bar -->
+                    <div class="top-bar glass-panel">
+                        <div class="address-box">
+                            <span class="icon">📍</span>
+                            <span id="current-address">Acquiring GPS...</span>
+                        </div>
+                        <div class="system-box">
+                            <span id="digital-clock">00:00</span>
+                            <button id="menu-btn">☰</button>
                         </div>
                     </div>
-                    <!-- Heading -->
-<!-- 3. Compass Ball -->
-<div class="tele-item">
-    <div class="compass-ball-container">
-        <div class="ball-lens"></div>
-        <div class="ball-marker">▼</div>
-        
-        <!-- EMPTY CONTAINER (JS will fill it) -->
-        <div class="compass-tape" id="compass-tape"></div>
-    </div>
-</div>
-<!-- Altitude / VSI -->
-                    <div class="tele-item vsi-row">
-                        <!-- The Round Dial -->
-                        <div class="vsi-dial">
-                             <!-- LABELS (New) -->
-                            <span class="vsi-label up">UP</span>
-                            <span class="vsi-label dn">DN</span>
 
-                              
+                    <!-- Telemetry instruments -->
+                    <div id="telemetry-widget" class="glass-panel">
+                        <div class="tele-item">
+                            <div
+                                class="instrument-dial speed-gauge-container"
+                                role="group"
+                                aria-label="Speed in kilometres per hour"
+                            >
+                                <div class="speed-ring-bg" aria-hidden="true"></div>
+                                <div class="speed-ring-active" id="speed-ring" aria-hidden="true"></div>
+                                <div class="speed-content">
+                                    <span id="speed-val">0</span>
+                                    <span class="unit">km/h</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tele-item">
+                            <div
+                                class="instrument-dial compass-ball-container"
+                                role="group"
+                                aria-label="GPS direction of travel"
+                            >
+                                <div class="ball-marker" aria-hidden="true"></div>
+                                <div class="compass-window" aria-hidden="true">
+                                    <div class="compass-tape" id="compass-tape"></div>
+                                </div>
+                                <span class="compass-bearing" id="heading-val">0</span>
+                            </div>
+                        </div>
+                        <div class="tele-item vsi-row">
+                            <div
+                                class="instrument-dial vsi-dial"
+                                role="group"
+                                aria-label="Vertical speed indicator"
+                            >
+                                <span class="vsi-label up">UP</span>
+                                <span class="vsi-label dn">DN</span>
                                 <span class="label-vsi">VSI</span>
-                            <!-- Needle (Starts at 3 o'clock) -->
-                            <div class="vsi-needle" id="vsi-needle"></div>
-                            <!-- Center cap for realism -->
-                            <div class="vsi-cap">
+                                <div class="vsi-needle" id="vsi-needle"></div>
+                                <div class="vsi-cap"></div>
+                            </div>
+                            <div class="alt-stack">
+                                <span id="alt-m-live">0</span>
+                                <span class="label">AMSL</span>
                             </div>
                         </div>
-                        
-                        <div class="alt-stack">
-                            <span id="alt-m-live">0</span>
-                            <span class="label">AMSL</span>
+                    </div>
+
+                    <!-- 3. Toggle Switch -->
+                    <div class="toggle-container">
+                        <button id="theme-toggle">
+                            <!-- Day Icon (Sun) -->
+                            <svg
+                                class="icon-sun"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <path
+                                    d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                                ></path>
+                            </svg>
+                            <span>/</span>
+                            <!-- Night Icon (Moon) -->
+                            <svg
+                                class="icon-moon"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN (Player) -->
+                <div class="right-column">
+                    <!-- 4. Album Art (Hero) -->
+                    <div id="album-art-container" class="glass-panel">
+                        <img id="player-logo" src="images/poster4.png" alt="Art" />
+                    </div>
+
+                    <!-- 5. Controls -->
+                    <div id="player-controls-bar" class="glass-panel">
+                        <div class="car-track-info">
+                            <div id="meta-station" class="car-station">Select Station</div>
+                            <div id="meta-title" class="car-title">Ready</div>
+                            <div id="meta-artist" class="car-artist"></div>
                         </div>
+                        <img id="stop-button" src="images/stop-button-2.png" alt="Stop" />
                     </div>
                 </div>
-
-                <!-- 3. Toggle Switch -->
-                <div class="toggle-container">
-                    <button id="theme-toggle" class="glass-btn">
-    <!-- Day Icon (Sun) -->
-    <svg class="icon-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"></circle>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-    </svg>
-    <span>/</span>
-    <!-- Night Icon (Moon) -->
-    <svg class="icon-moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-</button>
-
-                </div>
             </div>
 
-            <!-- RIGHT COLUMN (Player) -->
-            <div class="right-column">
-                
-                <!-- 4. Album Art (Hero) -->
-                <div id="album-art-container" class="glass-panel">
-                    <img id="player-logo" src="images/poster4.png" alt="Art">
+            <!-- BOTTOM AREA (Channels) -->
+            <div class="bottom-area">
+                <div id="channel-scroller" class="glass-panel">
+                    <!-- Channels injected by JS -->
                 </div>
-
-                <!-- 5. Controls -->
-                <div id="player-controls-bar" class="glass-panel">
-                    <div class="car-track-info">
-                        <div id="meta-station" class="car-station">Select Station</div>
-                        <div id="meta-title" class="car-title">Ready</div>
-                        <div id="meta-artist" class="car-artist"></div>
-                    </div>
-                    <img id="stop-button" src="images/stop-button-2.png" alt="Stop">
-                </div>
-            </div>
-
-        </div>
-
-        <!-- BOTTOM AREA (Channels) -->
-        <div class="bottom-area">
-            <div id="channel-scroller" class="glass-panel">
-                <!-- Channels injected by JS -->
             </div>
         </div>
 
-    </div>
+        <!-- Off-Canvas Menu -->
+        <div id="sideMenu">
+            <ul>
+                <li id="rerouteMenuItem" style="display: none">
+                    <a href="#" id="rerouteLink" class="menu-link">Reroute</a>
+                </li>
 
-    <!-- Off-Canvas Menu -->
-    <div id="sideMenu">
-        <ul>
-            <!-- Wake Lock Toggle -->
-            <li class="menu-toggle-item">
-                <label for="wakeLockToggle">Keep Screen Awake</label>
-                <label class="switch">
-                  <input type="checkbox" id="wakeLockToggle">
-                  <span class="slider"></span>
-                </label>
-            </li>
-            
-            <!-- About Link -->
-            <li><a href="#" id="aboutLink">About this PWA</a></li>
-        </ul>
-    </div>
+                <li id="clearRouteMenuItem" style="display: none">
+                    <a href="#" id="clearRouteLink" class="menu-link">Clear Route</a>
+                </li>
+                <!-- Wake Lock Toggle -->
+                <li><a href="#" id="goToLink" class="menu-link">Destination</a></li>
+                <li class="menu-toggle-item">
+                    <label for="wakeLockToggle">Keep Screen Awake</label>
+                    <label class="switch">
+                        <input type="checkbox" id="wakeLockToggle" />
+                        <span class="slider"></span>
+                    </label>
+                </li>
 
-    <!-- ABOUT MODAL (System Info) -->
-    <div id="aboutOverlay" class="full-screen-modal">
-        <div id="aboutPanelContent" class="modal-content glass-panel">
-            <!-- Content injected by JS -->
+                <!-- About Link -->
+                <li><a href="#" id="aboutLink" class="menu-link">About this PWA</a></li>
+            </ul>
         </div>
-    </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
-    <script src="car-app.js"></script>
-    <script src="map-app.js"></script>
-</body>
+        <!-- ABOUT MODAL (System Info) -->
+        <div id="aboutOverlay" class="full-screen-modal">
+            <div id="aboutPanelContent" class="modal-content glass-panel">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+
+        <div id="whereToOverlay" class="where-to-overlay">
+            <div class="where-to-panel">
+                <h2>Set Destination</h2>
+                <div id="saved-destinations"></div>
+                <input
+                    id="destination-search"
+                    type="text"
+                    placeholder="Enter an address"
+                    autocomplete="off"
+                />
+
+                <button id="destination-find">Find</button>
+
+                <div id="destination-results"></div>
+
+                <button id="destination-close">Close</button>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
+        <script src="config.js"></script>
+        <script src="config.local.js"></script>
+        <script src="car-app.js"></script>
+        <script src="map-app.js"></script>
+    </body>
 </html>

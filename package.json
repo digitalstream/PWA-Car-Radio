@@ -1,0 +1,13 @@
+{
+    "name": "better-car-radio-pwa",
+    "version": "6.15.0",
+    "private": true,
+    "description": "Static Android car-radio dashboard frontend",
+    "scripts": {
+        "test": "node --test"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "license": "MIT"
+}
